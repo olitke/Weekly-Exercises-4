@@ -227,14 +227,33 @@ starbucks_with_2018_pop_est %>%
 # lat = top and bottom
 # long = left and right
 favorite_places <- tibble(
-  place = c("Home", "Milenium Park", "Highschool", "Macalester", "Brother's Uni", "Halifax", "Powel's City of Books", "My Cousins"),
-  long = c(-87.68205, -87.62373, -87.69187, -93.16966, -71.25908, -63.59168, -122.68292,-112.0743),
-  lat = c(41.94262, 41.88203, 41.94462, 44.93983, 42.36586, 44.64762, 45.52266, 33.4306)
+  place = c("Home", "Milenium Park", "Highschool", "Macalester", "Brother's Uni", "Halifax", "Powel's City of Books", "My Cousins", "Rennes", "My Aunt"),
+  long = c(-87.68205, -87.62373, -87.69187, -93.16966, -71.25908, -63.59168, -122.68292,-112.0743, -1.6845, -97.5331),
+  lat = c(41.94262, 41.88203, 41.94462, 44.93983, 42.36586, 44.64762, 45.52266, 33.4306, 48.1069, 34.3385)
   )
+
+#top_3 <- tibble(
+#  place = c("Home", "Halifax", "Powel's City of Books"),
+#  long = c(-87.68205, -63.59168, -122.68292),
+#  lat = c(41.94262, 44.64762, 45.52266)
+#)
+
+top_3 <- favorite_places %>%
+  filter(place %in% c("Home", "Halifax", "Powel's City of Books"))
+ # mutate(best_3 = ifelse(place == "Home|Halifax|Powel's City of Books"), yes, no)
+
+col_pal <- colorNumeric("pink",
+            domain = favorite_places$top_3)
 
 leaflet(data = favorite_places) %>%
   addTiles() %>%
-  addMarkers()
+  addCircles(lng = ~long,
+             lat = ~lat,
+             label = ~place) %>%
+  addPolylines(lng = ~long,
+               lat = ~lat,
+               color = col2hex("green"))
+
 ```
   
 ## Revisiting old datasets
@@ -320,6 +339,11 @@ The following exercises will use the COVID-19 data from the NYT.
 covid19 %>%
   mutate(lower_case = str_to_lower(state)) %>%
   group_by(lower_case) %>%
+  summarize(big_g = max(cases)) %>%
+  left_join(census_pop_est_2018,
+            by = c("lower_case" = "state")) %>%
+  ggplot() +
+  geom_map()
 
 
 ```
@@ -390,23 +414,29 @@ mpls_all <- mpls_nbhd %>%
   17. Use `leaflet` to create a map from the `mpls_all` data  that colors the neighborhoods by `prop_suspicious`. Display the neighborhood name as you scroll over it. Describe what you observe in the map.
   
 ```{r}
-colorNumeric("viridius",
+pal <- colorNumeric("viridius",
             domain = mpls_all$prop_sus)
 
 mpls_all %>%
   leaflet() %>%
   addTiles() %>%
-  addPolygons(fillColor= ~pal(prop_sus,
-                          fillOpacity = .4))
+  addPolygons(fillColor = ~pal(prop_sus), #what is going on with the color?
+              fillOpacity = .4,
+              label = ~BDNAME)
 
 ```
   
   18. Use `leaflet` to create a map of your own choosing. Come up with a question you want to try to answer and use the map to help answer that question. Describe what your map shows. 
+  
+```{r}
+
+```
   
   
 ## GitHub link
 
   19. Below, provide a link to your GitHub page with this set of Weekly Exercises. Specifically, if the name of the file is 04_exercises.Rmd, provide a link to the 04_exercises.md file, which is the one that will be most readable on GitHub.
 
+[github page](https://github.com/olitke/Weekly-Exercises-4)
 
 **DID YOU REMEMBER TO UNCOMMENT THE OPTIONS AT THE TOP?**
